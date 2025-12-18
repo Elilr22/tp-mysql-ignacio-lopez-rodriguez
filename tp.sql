@@ -41,7 +41,7 @@ CREATE TABLE veterinarios(
 CREATE TABLE historial_clinico(
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_mascotas INT,
-    FOREIGN KEY (id_mascotas) REFERENCES mascotas(id),
+    FOREIGN KEY (id_mascotas) REFERENCES mascotas(id) ON DELETE CASCADE,
     id_veterinario INT,
     FOREIGN KEY (id_veterinario) REFERENCES veterinarios(id),
     fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -77,6 +77,8 @@ VALUES
 ('2','2','2025-11-25','Se observa cardiomegalia global (tamaño cardíaco aumentado)')
 
 
+
+
 --Ejercicio 7 – Actualizar registros
 --1. Cambiar la dirección de un dueño (por ID o nombre).
 UPDATE duenos
@@ -94,3 +96,55 @@ SET descripcion = 'Se observa cardiomegalia global, La tráquea y bronquios prin
 WHERE id = 2
 
 
+
+
+--Ejercicio 8 – Eliminar registros
+--1. Eliminar una mascota (por ID o nombre).
+DELETE FROM mascotas WHERE id = 1
+--2. Verificar que se eliminen automáticamente los registros del historial clínico asociados
+--(ON DELETE CASCADE).
+
+-- NO SE SI ESTA BIEN PERO PERO TUVE QUE HACER DE NUEVO LA TABLA 
+-- ELIMINARLA Y CREARLA CON EL ON DELETE CASCADE Y CUANDO EJECUTO DELETE FROM mascotas WHERE id = 1 YA SE BORRA DE LA TABLA historial_clinico
+
+
+--Ejercicio 9 – JOIN simple
+--Consulta que muestre:
+--● Nombre de la mascota
+--● Especie
+--● Nombre completo del dueño (nombre + apellido)
+
+SELECT 
+    m.nombre AS nombre_mascota, 
+    m.especie, 
+    CONCAT(d.nombre, ' ', d.apellido) AS nombre_completo_dueno
+FROM mascotas m
+INNER JOIN duenos d ON m.id_dueno = d.id;
+
+
+--Ejercicio 10 – JOIN múltiple con historial
+--Consulta que muestre todas las entradas del historial clínico con:
+--● Nombre y especie de la mascota
+--● Nombre completo del dueño
+--● Nombre completo del veterinario
+--● Fecha de registro
+--● Descripción
+--Ordenados por fecha de registro descendente (DESC).
+SELECT 
+
+    h.fecha_registro,
+    h.descripcion,
+    
+    CONCAT(d.nombre, ' ', d.apellido) AS nombre_completo_dueno,
+    CONCAT(v.nombre, ' ', v.apellido) AS nombre_completo_veterinario,
+    
+    m.nombre AS nombre_mascota,
+    m.especie
+
+FROM historial_clinico h
+
+INNER JOIN mascotas m ON m.id = h.id_mascotas
+INNER JOIN duenos d ON d.id = m.id_dueno
+INNER JOIN veterinarios v ON h.id_veterinario = v.id
+
+ORDER BY h.fecha_registro DESC;
